@@ -1,4 +1,18 @@
+# Files and directories to ignore in the repository
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+*.egg-info/
+
+# Environment
 .env
 poetry.lock
-__pycache__/
 .DS_Store
+
+# Large files
+# Ignore large files that are not needed in the repository
+# Uncomment the following line to ignore all files in the data directory
+data/*
