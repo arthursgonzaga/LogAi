@@ -5,7 +5,7 @@ from datetime import datetime
 from sklearn.ensemble import IsolationForest
 import os
 
-LOG_FILE = 'data/app.log'
+LOG_FILE = './data/app.log'
 
 LOG_LEVEL_MAPPING = {
     'INFO': 0,
@@ -19,28 +19,25 @@ def read_log(file_path):
     with open(file_path, 'r') as f:
         for line in f:
             try:
-                timestamp, log_level, message = map(str.strip, line.split('|', 2))
+                parts = line.strip().split(' ', 2)
+                if len(parts) < 3:
+                    continue
+                timestamp = f"{parts[0]} {parts[1]}"
+                log_level = parts[2].split(' ', 1)[0]
+                message = parts[2].split(' ', 1)[1]
                 data.append({
                     'timestamp': timestamp,
                     'log_level': log_level,
                     'message': message
                 })
-            except ValueError:
-                # Ignore linhas que não seguem o formato esperado
+            except (IndexError, ValueError):
                 continue
 
-    # Verifique se há dados suficientes para criar o DataFrame
     if not data:
         raise ValueError(f"O arquivo {file_path} está vazio ou não contém linhas válidas no formato esperado.")
 
     # Crie o DataFrame
     df = pd.DataFrame(data)
-
-    # Verifique se as colunas esperadas estão presentes
-    expected_columns = ['timestamp', 'log_level', 'message']
-    for col in expected_columns:
-        if col not in df.columns:
-            raise KeyError(f"A coluna esperada '{col}' não foi encontrada no DataFrame.")
 
     return df
 
@@ -98,20 +95,23 @@ def main():
         return
 
     df = read_log(LOG_FILE)
-    df = extract_features(df)
 
-    feature_cols = [
-        'hour', 'level_num', 'message_length', 'slow_query',
-        'has_error_keyword', 'is_database_related', 'word_count', 'is_warning'
-    ]
+    print(df.head())  # Exibir as primeiras linhas do DataFrame
 
-    df = detect_anomalies(df, feature_cols)
+    # df = extract_features(df)
 
-    # Salvar para futuras visualizações
-    os.makedirs('output', exist_ok=True)
-    df.to_csv('output/logs_with_anomalies.csv', index=False)
+#     feature_cols = [
+#         'hour', 'level_num', 'message_length', 'slow_query',
+#         'has_error_keyword', 'is_database_related', 'word_count', 'is_warning'
+#     ]
 
-    generate_report(df)
+#     df = detect_anomalies(df, feature_cols)
+
+#     # Salvar para futuras visualizações
+#     os.makedirs('output', exist_ok=True)
+#     df.to_csv('output/logs_with_anomalies.csv', index=False)
+
+#     generate_report(df)
 
 if __name__ == '__main__':
     main()
