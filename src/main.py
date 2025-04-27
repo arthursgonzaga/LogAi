@@ -95,23 +95,22 @@ def main():
         return
 
     df = read_log(LOG_FILE)
+    df = extract_features(df)
 
-    print(df.head())  # Exibir as primeiras linhas do DataFrame
+    feature_cols = [
+        'hour', 'level_num', 'message_length', 'slow_query',
+        'has_error_keyword', 'is_database_related', 'word_count', 'is_warning'
+    ]
 
-    # df = extract_features(df)
+    df = detect_anomalies(df, feature_cols)
 
-#     feature_cols = [
-#         'hour', 'level_num', 'message_length', 'slow_query',
-#         'has_error_keyword', 'is_database_related', 'word_count', 'is_warning'
-#     ]
+    os.makedirs('./data/output/', exist_ok=True)
+    df.to_csv('./data/output/processed_logs.csv', index=False)
 
-#     df = detect_anomalies(df, feature_cols)
+    anomalies = df[df['anomaly'] == 1]
+    anomalies.to_csv('./data/output/anomalies.csv', index=False)
 
-#     # Salvar para futuras visualizações
-#     os.makedirs('output', exist_ok=True)
-#     df.to_csv('output/logs_with_anomalies.csv', index=False)
-
-#     generate_report(df)
+    generate_report(df)
 
 if __name__ == '__main__':
     main()
