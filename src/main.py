@@ -78,7 +78,6 @@ def detect_anomalies(df, features):
     df['anomaly'] = df['anomaly'].map({1: 0, -1: 1})  # 1 para anomalia
     return df
 
-# Função para gerar relatório
 def generate_report(df):
     print("\n====== Relatório de Análise de Logs ======")
     print(f"Total de registros: {len(df)}")
@@ -88,7 +87,6 @@ def generate_report(df):
     print("\nExemplos de anomalias:")
     print(df[df['anomaly'] == 1][['timestamp', 'log_level', 'message']].head(10))
 
-# Função principal
 def main():
     if not os.path.exists(LOG_FILE):
         print(f"Arquivo {LOG_FILE} não encontrado.")
